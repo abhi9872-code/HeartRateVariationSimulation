@@ -1,0 +1,55 @@
+import tkinter as tk
+from tkinter import *
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+# Function to generate HR signal
+def generate_signal(hr):
+    t = np.linspace(0, 10, 2000)
+    freq = hr / 60
+    if hr == 70:
+        signal = np.sin(2 * np.pi * freq * t)  # Calm (smooth)
+    else:
+        signal = np.sin(2 * np.pi * freq * t) + 0.3 * np.random.randn(len(t))  # Stress (noisy)
+    return t, signal
+
+# Update graph when button is pressed
+def update_graph(hr):
+    t, signal = generate_signal(hr)
+    ax.clear()
+    
+    if hr == 70:
+        ax.set_title("Calm Heart Rate: 70 bpm")
+    else:
+        ax.set_title("Stress Heart Rate: 110 bpm")
+    
+    ax.plot(t, signal)
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Amplitude")
+    canvas.draw()
+
+# GUI Window
+root = tk.Tk()
+root.title("Heart Rate Variation Simulation (Stress vs Calm)")
+root.geometry("900x600")
+
+# Buttons
+btn_calm = Button(root, text="Calm Mode (70 bpm)", font=("Arial", 14),
+                  bg="#4CAF50", fg="white", command=lambda: update_graph(70))
+btn_calm.pack(pady=10)
+
+btn_stress = Button(root, text="Stress Mode (110 bpm)", font=("Arial", 14),
+                    bg="#F44336", fg="white", command=lambda: update_graph(110))
+btn_stress.pack(pady=10)
+
+# Graph area
+fig = plt.Figure(figsize=(8, 4), dpi=100)
+ax = fig.add_subplot(111)
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack()
+
+# Start with calm mode
+update_graph(70)
+
+root.mainloop()
